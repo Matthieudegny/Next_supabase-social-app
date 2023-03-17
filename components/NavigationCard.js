@@ -115,6 +115,7 @@ export default function NavigationCard() {
           <span className="hidden md:block">Notifications</span>
         </Link>
         <button onClick={logout} className="w-full -my-2">
+          {/* the span is only here to replace the link */}
           <span className={nonActiveElementClasses}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

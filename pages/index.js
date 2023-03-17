@@ -17,6 +17,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    //Returns the session data, if there is an active session.
     if (!session?.user?.id) {
       return;
     }
@@ -25,6 +26,7 @@ export default function Home() {
       .select()
       .eq("id", session.user.id)
       .then((result) => {
+        console.log("result", result);
         if (result.data.length) {
           setProfile(result.data[0]);
         }
