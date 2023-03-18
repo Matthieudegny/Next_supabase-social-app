@@ -123,7 +123,7 @@ export default function PostCard({
         parent: id,
       })
       .then((result) => {
-        console.log(result);
+        console.log("insert comment", result);
         fetchComments();
         setCommentText("");
       });
@@ -172,7 +172,7 @@ export default function PostCard({
           {dropdownOpen && (
             <div className="bg-red w-5 h-5 absolute top-0"></div>
           )}
-          {/* <ClickOutHandler onClickOut={handleClickOutsideDropdown}>
+          <ClickOutHandler onClickOut={handleClickOutsideDropdown}>
             <div className="relative">
               {dropdownOpen && (
                 <div className="absolute -right-6 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
@@ -296,7 +296,7 @@ export default function PostCard({
                 </div>
               )}
             </div>
-          </ClickOutHandler> */}
+          </ClickOutHandler>
         </div>
       </div>
       <div>

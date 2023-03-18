@@ -35,6 +35,7 @@ export default function ProfilePage() {
     supabase
       .from("profiles")
       .select()
+      //eq -> match
       .eq("id", userId)
       .then((result) => {
         if (result.error) {
@@ -62,6 +63,8 @@ export default function ProfilePage() {
       });
   }
 
+  //check if  elements conern the user
+  //userId from the URL (id route) compare to session.id
   const isMyUser = userId === session?.user?.id;
 
   return (

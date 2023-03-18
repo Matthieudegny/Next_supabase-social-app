@@ -10,11 +10,27 @@ export default function PostFormCard({ onPost }) {
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const supabase = useSupabaseClient();
+  //session.user.id
   const session = useSession();
   const { profile } = useContext(UserContext);
 
+  //get info from the user
+  useEffect(() => {
+    console.log("session", session.user.id);
+    supabase
+      .from("profiles")
+      .select()
+      //eq = match
+      .eq("id", session.user.id)
+      .then((result) => {
+        // console.log(result);
+      });
+  }, []);
+
   function createPost() {
     supabase
+      //table posts
+      //the policy for this table is set as author = auth.uid()
       .from("posts")
       .insert({
         author: session.user.id,
@@ -28,6 +44,8 @@ export default function PostFormCard({ onPost }) {
           if (onPost) {
             onPost();
           }
+        } else {
+          console.log("response false", response);
         }
       });
   }
@@ -40,20 +58,33 @@ export default function PostFormCard({ onPost }) {
         const newName = Date.now() + file.name;
         const result = await supabase.storage
           .from("photos")
-          .upload(newName, file);
-        if (result.data) {
+          .upload(newName, file)
+          .then((result) => {
+            console.log("result", result);
+            const url =
+              //.env + url to the supabase storage
+              process.env.NEXT_PUBLIC_SUPABASE_URL +
+              "/storage/v1/object/public/photos/" +
+              result.data.path;
+            setUploads((prevUploads) => [...prevUploads, url]);
+          });
+        if (result?.data) {
           const url =
+            //.env + url to the supabase storage
             process.env.NEXT_PUBLIC_SUPABASE_URL +
             "/storage/v1/object/public/photos/" +
             result.data.path;
           setUploads((prevUploads) => [...prevUploads, url]);
         } else {
-          console.log(result);
+          console.log("error add photo", result);
         }
       }
       setIsUploading(false);
     }
   }
+  useEffect(() => {
+    console.log("uploads", uploads);
+  }, [uploads]);
 
   return (
     <Card>

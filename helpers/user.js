@@ -7,6 +7,7 @@ export async function uploadUserProfileImage(
 ) {
   return new Promise(async (resolve, reject) => {
     const newName = Date.now() + file.name;
+    //save it to the storage cover
     const { data, error } = await supabase.storage
       .from(bucket)
       .upload(newName, file);
@@ -17,6 +18,7 @@ export async function uploadUserProfileImage(
         process.env.NEXT_PUBLIC_SUPABASE_URL +
         `/storage/v1/object/public/${bucket}/` +
         data.path;
+      //update profile table with the new picture
       supabase
         .from("profiles")
         .update({

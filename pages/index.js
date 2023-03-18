@@ -13,11 +13,7 @@ export default function Home() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  useEffect(() => {
-    //Returns the session data, if there is an active session.
+    //Returns the user's datas, if there is an active session.
     if (!session?.user?.id) {
       return;
     }
@@ -26,7 +22,7 @@ export default function Home() {
       .select()
       .eq("id", session.user.id)
       .then((result) => {
-        console.log("result", result);
+        console.log("from profiles", result);
         if (result.data.length) {
           setProfile(result.data[0]);
         }
@@ -36,6 +32,7 @@ export default function Home() {
   function fetchPosts() {
     supabase
       .from("posts")
+      //profiles(id...) is a reference for the table profiles -> post.is = foreign key // profiles.id = primary key
       .select("id, content, created_at, photos, profiles(id, avatar, name)")
       .is("parent", null)
       .order("created_at", { ascending: false })

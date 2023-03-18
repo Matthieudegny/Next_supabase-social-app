@@ -20,6 +20,7 @@ export default function Cover({ url, editable, onChange }) {
         "cover"
       );
       setIsUploading(false);
+      //sync new datas onchange => fetchUser
       if (onChange) onChange();
     }
   }
