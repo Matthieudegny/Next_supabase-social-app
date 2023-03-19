@@ -13,6 +13,10 @@ export default function Home() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
     //Returns the user's datas, if there is an active session.
     if (!session?.user?.id) {
       return;
@@ -34,6 +38,7 @@ export default function Home() {
       .from("posts")
       //profiles(id...) is a reference for the table profiles -> post.is = foreign key // profiles.id = primary key
       .select("id, content, created_at, photos, profiles(id, avatar, name)")
+      //the posts with parent are comments from posts (parent is column in the table post)
       .is("parent", null)
       .order("created_at", { ascending: false })
       .then((result) => {

@@ -13,7 +13,7 @@ export default function ProfileContent({ activeTab, userId }) {
       return;
     }
     if (activeTab === "posts") {
-      loadPosts().then(() => {});
+      loadPosts();
     }
   }, [userId]);
 

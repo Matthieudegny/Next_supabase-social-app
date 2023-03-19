@@ -82,9 +82,6 @@ export default function PostFormCard({ onPost }) {
       setIsUploading(false);
     }
   }
-  useEffect(() => {
-    console.log("uploads", uploads);
-  }, [uploads]);
 
   return (
     <Card>

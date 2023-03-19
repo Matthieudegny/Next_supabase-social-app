@@ -13,11 +13,13 @@ export default function SavedPostsPage() {
       return;
     }
     supabase
+      //i fetch all the post'ids saved
       .from("saved_posts")
       .select("post_id")
       .eq("user_id", session.user.id)
       .then((result) => {
         const postsIds = result.data.map((item) => item.post_id);
+        //i fetch the posts saved thanks their ids
         supabase
           .from("posts")
           .select("*, profiles(*)")
