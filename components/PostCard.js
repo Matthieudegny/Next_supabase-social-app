@@ -53,7 +53,10 @@ export default function PostCard({
       .select("*, profiles(*)")
       //i fetch only the comments from this post thanks the id
       .eq("parent", id)
-      .then((result) => setComments(result.data));
+      .then((result) => {
+        setComments(result.data);
+        console.log("result", result);
+      });
   }
   function openDropdown(e) {
     e.stopPropagation();
@@ -175,6 +178,7 @@ export default function PostCard({
           {dropdownOpen && (
             <div className="bg-red w-5 h-5 absolute top-0"></div>
           )}
+
           {/* <ClickOutHandler onClickOut={handleClickOutsideDropdown}> */}
           <div className="relative">
             {dropdownOpen && (
