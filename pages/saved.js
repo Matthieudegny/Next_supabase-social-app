@@ -32,11 +32,7 @@ export default function SavedPostsPage() {
       <UserContextProvider>
         <h1 className="text-6xl mb-4 text-gray-300">Saved posts</h1>
         {posts.length > 0 &&
-          posts.map((post) => (
-            <div key={post.id}>
-              <PostCard {...post} />
-            </div>
-          ))}
+          posts.map((post) => <PostCard key={post.id} {...post} />)}
       </UserContextProvider>
     </Layout>
   );

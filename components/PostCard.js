@@ -158,7 +158,7 @@ export default function PostCard({
             <ReactTimeAgo date={new Date(created_at).getTime()} />
           </p>
         </div>
-        <div className="relative">
+        <div className="">
           <button className="text-gray-400" onClick={openDropdown}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -371,11 +371,11 @@ export default function PostCard({
           4
         </button>
       </div>
-      <div className="flex mt-4 gap-3">
+      <div className="flex mt-4 gap-3 items-center">
         <div>
           <Avatar url={myProfile?.avatar} />
         </div>
-        <div className="border grow rounded-full relative">
+        <div className="border grow rounded-full">
           <form onSubmit={postComment}>
             <input
               value={commentText}
@@ -384,22 +384,7 @@ export default function PostCard({
               placeholder="Leave a comment"
             />
           </form>
-          <button className="absolute top-3 right-3 text-gray-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-              />
-            </svg>
-          </button>
+          <button className="absolute top-3 right-3 text-gray-400"></button>
         </div>
       </div>
       {/* display comments */}

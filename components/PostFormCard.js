@@ -85,7 +85,7 @@ export default function PostFormCard({ onPost }) {
 
   return (
     <Card>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <div>
           <Avatar url={profile?.avatar} />
         </div>
