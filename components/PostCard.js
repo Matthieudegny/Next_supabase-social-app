@@ -1,7 +1,7 @@
 import Avatar from "./Avatar";
 import Card from "./Card";
 // import ClickOutHandler from "react-clickout-handler";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../contexts/UserContext";
@@ -62,10 +62,7 @@ export default function PostCard({
     e.stopPropagation();
     setDropdownOpen(true);
   }
-  function handleClickOutsideDropdown(e) {
-    e.stopPropagation();
-    setDropdownOpen(false);
-  }
+
   function toggleSave() {
     if (isSaved) {
       supabase
@@ -135,6 +132,14 @@ export default function PostCard({
       });
   }
 
+  useEffect(() => {
+    const closeDropDownMenu = (e) => {
+      setDropdownOpen(false);
+    };
+    document.body.addEventListener("click", closeDropDownMenu);
+    return () => document.body.removeEventListener("click", closeDropDownMenu);
+  }, []);
+
   return (
     <Card>
       <div className="flex gap-3">
@@ -158,31 +163,50 @@ export default function PostCard({
             <ReactTimeAgo date={new Date(created_at).getTime()} />
           </p>
         </div>
-        <div className="">
-          <button className="text-gray-400" onClick={openDropdown}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
+        <div>
+          {dropdownOpen ? (
+            <button
+              className="text-gray-400"
+              onClick={() => setDropdownOpen(false)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-              />
-            </svg>
-          </button>
-          {dropdownOpen && (
-            <div className="bg-red w-5 h-5 absolute top-0"></div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          ) : (
+            <button className="text-gray-400" onClick={openDropdown}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
+            </button>
           )}
 
           {/* <ClickOutHandler onClickOut={handleClickOutsideDropdown}> */}
           <div className="relative">
             {dropdownOpen && (
-              <div className="absolute -right-6 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
+              <div className="absolute -right-4 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
                 <button onClick={toggleSave} className="w-full -my-2">
                   <span className="flex -mx-4 hover:shadow-md gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white px-4 rounded-md transition-all hover:scale-110 shadow-gray-300">
                     {isSaved && (
