@@ -5,7 +5,7 @@ import { useContext, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../contexts/UserContext";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
 export default function PostCard({
   id,
@@ -21,6 +21,8 @@ export default function PostCard({
   const [isSaved, setIsSaved] = useState(false);
   const { profile: myProfile } = useContext(UserContext);
   const supabase = useSupabaseClient();
+  //session.user.id
+  const session = useSession();
   useEffect(() => {
     fetchLikes();
     fetchComments();
@@ -55,7 +57,6 @@ export default function PostCard({
       .eq("parent", id)
       .then((result) => {
         setComments(result.data);
-        console.log("result", result);
       });
   }
   function openDropdown(e) {
@@ -100,7 +101,8 @@ export default function PostCard({
         .delete()
         .eq("post_id", id)
         .eq("user_id", myProfile.id)
-        .then(() => {
+        .then((result) => {
+          console.log("result like", result);
           fetchLikes();
         });
       return;
@@ -126,9 +128,19 @@ export default function PostCard({
         parent: id,
       })
       .then((result) => {
-        console.log("insert comment", result);
         fetchComments();
         setCommentText("");
+      });
+  }
+
+  function deleteComment(id) {
+    supabase
+      .from("posts")
+      .delete()
+      .eq("id", id)
+      .then((result) => {
+        console.log("result", result);
+        fetchComments();
       });
   }
 
@@ -144,7 +156,7 @@ export default function PostCard({
     <Card>
       <div className="flex gap-3">
         <div>
-          <Link href={"/profile"}>
+          <Link href={"/profile/" + authorProfile.id}>
             <span className="cursor-pointer">
               <Avatar url={authorProfile.avatar} />
             </span>
@@ -203,7 +215,6 @@ export default function PostCard({
             </button>
           )}
 
-          {/* <ClickOutHandler onClickOut={handleClickOutsideDropdown}> */}
           <div className="relative">
             {dropdownOpen && (
               <div className="absolute -right-4 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
@@ -327,7 +338,6 @@ export default function PostCard({
               </div>
             )}
           </div>
-          {/* </ClickOutHandler> */}
         </div>
       </div>
       <div>
@@ -408,16 +418,15 @@ export default function PostCard({
               placeholder="Leave a comment"
             />
           </form>
-          <button className="absolute top-3 right-3 text-gray-400"></button>
         </div>
       </div>
-      {/* display comments */}
+
       <div>
         {comments.length > 0 &&
           comments.map((comment) => (
             <div key={comment.id} className="mt-2 flex gap-2 items-center">
               <Avatar url={comment.profiles.avatar} />
-              <div className="bg-gray-200 py-2 px-4 rounded-3xl">
+              <div className="bg-gray-200 py-2 px-4 rounded-3xl md:max-w-full md:ml-1">
                 <div>
                   <Link href={"/profile/" + comment.profiles.id}>
                     <span className="hover:underline font-semibold mr-1">
@@ -431,8 +440,35 @@ export default function PostCard({
                     />
                   </span>
                 </div>
-                <p className="text-sm">{comment.content}</p>
+                <p className="text-sm text-ellipsis overflow-hidden max-w-prose">
+                  {comment.content}
+                </p>
               </div>
+              {session.user.id == comment.profiles.id ? (
+                <div>
+                  <button
+                    className="text-gray-400"
+                    onClick={() => deleteComment(comment.id)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                ""
+              )}
             </div>
           ))}
       </div>
