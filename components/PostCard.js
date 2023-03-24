@@ -1,7 +1,7 @@
 import Avatar from "./Avatar";
 import Card from "./Card";
 // import ClickOutHandler from "react-clickout-handler";
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "../contexts/UserContext";
@@ -13,6 +13,7 @@ export default function PostCard({
   created_at,
   photos,
   profiles: authorProfile,
+  fetchPosts,
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [likes, setLikes] = useState([]);
@@ -141,6 +142,17 @@ export default function PostCard({
       .then((result) => {
         console.log("result", result);
         fetchComments();
+      });
+  }
+
+  function deletePost(id) {
+    supabase
+      .from("posts")
+      .delete()
+      .eq("id", id)
+      .then((result) => {
+        console.log("result", result);
+        fetchPosts();
       });
   }
 
@@ -296,8 +308,8 @@ export default function PostCard({
                   Hide post
                 </a>
                 <a
-                  href=""
                   className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
+                  onClick={() => deletePost(id)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -386,23 +398,6 @@ export default function PostCard({
             />
           </svg>
           {comments.length}
-        </button>
-        <button className="flex gap-2 items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-            />
-          </svg>
-          4
         </button>
       </div>
       <div className="flex mt-4 gap-3 items-center">

@@ -10,6 +10,7 @@ TimeAgo.addDefaultLocale(en);
 
 function MyApp({ Component, pageProps }) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
+
   return (
     <SessionContextProvider
       supabaseClient={supabaseClient}

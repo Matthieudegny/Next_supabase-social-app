@@ -1,10 +1,14 @@
+import { useContext, useEffect, useState } from "react";
 import Card from "./Card";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { UserContext } from "../contexts/UserContext";
 
 export default function NavigationCard() {
   const router = useRouter();
+  const { profile: myProfile } = useContext(UserContext);
+  console.log("profile", profile);
   const { asPath: pathname } = router;
   const activeElementClasses =
     "text-sm md:text-md flex gap-1 md:gap-3 py-3 my-1 bg-socialBlue text-white md:-mx-7 px-6 md:px-7 rounded-md shadow-md shadow-gray-300 items-center";
@@ -43,8 +47,9 @@ export default function NavigationCard() {
             </svg>
             <span className="hidden md:block">Home</span>
           </Link>
+
           <Link
-            href="/profile/friends"
+            href={"/profile/"}
             className={
               pathname === "/profile/friends"
                 ? activeElementClasses
@@ -90,30 +95,6 @@ export default function NavigationCard() {
               />
             </svg>
             <span className="hidden md:block">Saved posts</span>
-          </Link>
-          <Link
-            href="/notifications"
-            className={
-              pathname === "/notifications"
-                ? activeElementClasses
-                : nonActiveElementClasses
-            }
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-              />
-            </svg>
-            <span className="hidden md:block">Notifications</span>
           </Link>
           <button onClick={logout} className="-my-2 md:block md:w-full">
             {/* the span is only here to replace the link */}

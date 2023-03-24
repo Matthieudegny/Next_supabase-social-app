@@ -38,7 +38,7 @@ export default function Home() {
       .from("posts")
       //profiles(id...) is a reference for the table profiles -> post.is = foreign key // profiles.id = primary key
       .select("id, content, created_at, photos, profiles(id, avatar, name)")
-      //the posts with parent are comments from posts (parent is column in the table post)
+      //the posts with parent null are the main posts, parent !null are post as comment of the main post
       .is("parent", null)
       .order("created_at", { ascending: false })
       .then((result) => {
@@ -52,12 +52,14 @@ export default function Home() {
   }
 
   return (
-    <Layout>
-      <UserContext.Provider value={{ profile }}>
+    <UserContext.Provider value={{ profile }}>
+      <Layout>
         <PostFormCard onPost={fetchPosts} />
         {posts?.length > 0 &&
-          posts.map((post) => <PostCard key={post.id} {...post} />)}
-      </UserContext.Provider>
-    </Layout>
+          posts.map((post) => (
+            <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />
+          ))}
+      </Layout>
+    </UserContext.Provider>
   );
 }
