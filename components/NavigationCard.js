@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import Card from "./Card";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "@/contexts/UserContext";
 
 export default function NavigationCard() {
   const router = useRouter();
-  const { profile: myProfile } = useContext(UserContext);
-  console.log("profile", profile);
+  const { profile } = useContext(UserContext);
+
   const { asPath: pathname } = router;
   const activeElementClasses =
     "text-sm md:text-md flex gap-1 md:gap-3 py-3 my-1 bg-socialBlue text-white md:-mx-7 px-6 md:px-7 rounded-md shadow-md shadow-gray-300 items-center";
@@ -19,6 +19,10 @@ export default function NavigationCard() {
   async function logout() {
     await supabase.auth.signOut();
   }
+
+  //profile as a state in the parent component, is set at null, just the time to be set
+  //i protect its value with 0, to be read
+  let link = profile ? profile.id : 0;
 
   return (
     <div>
@@ -49,9 +53,9 @@ export default function NavigationCard() {
           </Link>
 
           <Link
-            href={"/profile/"}
+            href={"/profile/" + link}
             className={
-              pathname === "/profile/friends"
+              pathname === "/profile/"
                 ? activeElementClasses
                 : nonActiveElementClasses
             }
@@ -70,7 +74,7 @@ export default function NavigationCard() {
                 d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
               />
             </svg>
-            <span className="hidden md:block">Friends</span>
+            <span className="hidden md:block">My profile</span>
           </Link>
           <Link
             href="/saved"

@@ -5,8 +5,9 @@ export default function Layout({ children, hideNavigation }) {
   if (hideNavigation) {
     rightColumnClasses += "w-full";
   } else {
-    rightColumnClasses += "mx-4 md:mx-0 md:w-9/12 ml-8";
+    rightColumnClasses += "mx-4 md:mx-0 md:w-9/12 md:ml-72";
   }
+
   return (
     <div className="md:flex mt-4 max-w-4xl mx-auto gap-6 mb-24 md:mb-0">
       {!hideNavigation && (
@@ -14,8 +15,7 @@ export default function Layout({ children, hideNavigation }) {
           <NavigationCard />
         </div>
       )}
-      {/* <div className={rightColumnClasses}>{children}</div> */}
-      <div className="mx-4 md:mx-0 md:w-9/12 md:ml-72">{children}</div>
+      <div className={rightColumnClasses}>{children}</div>
     </div>
   );
 }

@@ -2,12 +2,13 @@ import Layout from "../components/Layout";
 import PostCard from "../components/PostCard";
 import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { UserContextProvider } from "../contexts/UserContext";
+import { UserContext } from "../contexts/UserContext";
 
 export default function SavedPostsPage() {
   const [posts, setPosts] = useState([]);
   const session = useSession();
   const supabase = useSupabaseClient();
+
   useEffect(() => {
     if (!session?.user?.id) {
       return;
@@ -29,11 +30,9 @@ export default function SavedPostsPage() {
   }, [session?.user?.id]);
   return (
     <Layout>
-      <UserContextProvider>
-        <h1 className="text-6xl mb-4 text-gray-300">Saved posts</h1>
-        {posts.length > 0 &&
-          posts.map((post) => <PostCard key={post.id} {...post} />)}
-      </UserContextProvider>
+      <h1 className="text-6xl mb-4 text-gray-300">Saved posts</h1>
+      {posts.length > 0 &&
+        posts.map((post) => <PostCard key={post.id} {...post} />)}
     </Layout>
   );
 }

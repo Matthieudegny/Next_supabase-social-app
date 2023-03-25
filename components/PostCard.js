@@ -4,7 +4,7 @@ import Card from "./Card";
 import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import ReactTimeAgo from "react-time-ago";
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "@/contexts/UserContext";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
 export default function PostCard({
@@ -12,7 +12,6 @@ export default function PostCard({
   content,
   created_at,
   photos,
-  profiles: authorProfile,
   fetchPosts,
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -20,21 +19,28 @@ export default function PostCard({
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [isSaved, setIsSaved] = useState(false);
-  const { profile: myProfile } = useContext(UserContext);
   const supabase = useSupabaseClient();
+  const { profile } = useContext(UserContext);
+
+  //while waiting for the amount of the component and the fetch
+  let profilId = profile ? profile.id : 0;
+  let profilAvatar = profile ? profile.avatar : 0;
+  let profilName = profile ? profile.name : 0;
+
   //session.user.id
   const session = useSession();
   useEffect(() => {
     fetchLikes();
     fetchComments();
-    if (myProfile?.id) fetchIsSaved();
-  }, [myProfile?.id]);
-  function fetchIsSaved() {
+    if (profilId) fetchIsSaved();
+  }, [profilId]);
+
+  const fetchIsSaved = () => {
     supabase
       .from("saved_posts")
       .select()
       .eq("post_id", id)
-      .eq("user_id", myProfile?.id)
+      .eq("user_id", profilId)
       .then((result) => {
         if (result.data.length > 0) {
           setIsSaved(true);
@@ -42,36 +48,38 @@ export default function PostCard({
           setIsSaved(false);
         }
       });
-  }
-  function fetchLikes() {
+  };
+  const fetchLikes = () => {
     supabase
       .from("likes")
       .select()
       .eq("post_id", id)
       .then((result) => setLikes(result.data));
-  }
-  function fetchComments() {
+  };
+  const fetchComments = () => {
+    console.log("iddddd", id);
     supabase
       .from("posts")
       .select("*, profiles(*)")
       //i fetch only the comments from this post thanks the id
       .eq("parent", id)
       .then((result) => {
+        console.log("fetch comment", result);
         setComments(result.data);
       });
-  }
-  function openDropdown(e) {
+  };
+  const openDropdown = (e) => {
     e.stopPropagation();
     setDropdownOpen(true);
-  }
+  };
 
-  function toggleSave() {
+  const toggleSave = () => {
     if (isSaved) {
       supabase
         .from("saved_posts")
         .delete()
         .eq("post_id", id)
-        .eq("user_id", myProfile?.id)
+        .eq("user_id", profilId)
         .then((result) => {
           setIsSaved(false);
           setDropdownOpen(false);
@@ -81,7 +89,7 @@ export default function PostCard({
       supabase
         .from("saved_posts")
         .insert({
-          user_id: myProfile.id,
+          user_id: profilId,
           post_id: id,
         })
         .then((result) => {
@@ -89,19 +97,19 @@ export default function PostCard({
           setDropdownOpen(false);
         });
     }
-  }
+  };
 
   //if in the likes table compare if the like.user_id (the id ok the user who liked the picture) is the same than the user.id (user session)
   // !! -> return a boolean
-  const isLikedByMe = !!likes.find((like) => like.user_id === myProfile?.id);
+  const isLikedByMe = !!likes.find((like) => like.user_id === profilId);
 
-  function toggleLike() {
+  const toggleLike = () => {
     if (isLikedByMe) {
       supabase
         .from("likes")
         .delete()
         .eq("post_id", id)
-        .eq("user_id", myProfile.id)
+        .eq("user_id", profilId)
         .then((result) => {
           console.log("result like", result);
           fetchLikes();
@@ -112,29 +120,30 @@ export default function PostCard({
       .from("likes")
       .insert({
         post_id: id,
-        user_id: myProfile.id,
+        user_id: profilId,
       })
       .then((result) => {
         fetchLikes();
       });
-  }
+  };
 
-  function postComment(ev) {
+  const postComment = (ev) => {
     ev.preventDefault();
     supabase
       .from("posts")
       .insert({
         content: commentText,
-        author: myProfile.id,
+        author: profilId,
         parent: id,
       })
       .then((result) => {
+        console.log("post comment", result);
         fetchComments();
         setCommentText("");
       });
-  }
+  };
 
-  function deleteComment(id) {
+  const deleteComment = (id) => {
     supabase
       .from("posts")
       .delete()
@@ -143,9 +152,9 @@ export default function PostCard({
         console.log("result", result);
         fetchComments();
       });
-  }
+  };
 
-  function deletePost(id) {
+  const deletePost = (id) => {
     supabase
       .from("posts")
       .delete()
@@ -154,8 +163,9 @@ export default function PostCard({
         console.log("result", result);
         fetchPosts();
       });
-  }
+  };
 
+  //on click out -> close the menu
   useEffect(() => {
     const closeDropDownMenu = (e) => {
       setDropdownOpen(false);
@@ -168,17 +178,17 @@ export default function PostCard({
     <Card>
       <div className="flex gap-3">
         <div>
-          <Link href={"/profile/" + authorProfile.id}>
+          <Link href={"/profile/" + profilId}>
             <span className="cursor-pointer">
-              <Avatar url={authorProfile.avatar} />
+              <Avatar url={profilAvatar} />
             </span>
           </Link>
         </div>
         <div className="grow">
           <p>
-            <Link href={"/profile/" + authorProfile.id}>
+            <Link href={"/profile/" + profilId}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
-                {authorProfile.name}
+                {profilName}
               </span>
             </Link>
             shared a post
@@ -229,7 +239,7 @@ export default function PostCard({
 
           <div className="relative">
             {dropdownOpen && (
-              <div className="absolute -right-4 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
+              <div className="absolute -right-4 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52 md:pt-6">
                 <button onClick={toggleSave} className="w-full -my-2">
                   <span className="flex -mx-4 hover:shadow-md gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white px-4 rounded-md transition-all hover:scale-110 shadow-gray-300">
                     {isSaved && (
@@ -267,46 +277,7 @@ export default function PostCard({
                     {isSaved ? "Remove from saved" : "Save post"}
                   </span>
                 </button>
-                <a
-                  href=""
-                  className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5"
-                    />
-                  </svg>
-                  Turn notifications
-                </a>
-                <a
-                  href=""
-                  className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  Hide post
-                </a>
+
                 <a
                   className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
                   onClick={() => deletePost(id)}
@@ -326,26 +297,6 @@ export default function PostCard({
                     />
                   </svg>
                   Delete
-                </a>
-                <a
-                  href=""
-                  className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                    />
-                  </svg>
-                  Report
                 </a>
               </div>
             )}
@@ -402,7 +353,7 @@ export default function PostCard({
       </div>
       <div className="flex mt-4 gap-3 items-center">
         <div>
-          <Avatar url={myProfile?.avatar} />
+          <Avatar url={profilAvatar} />
         </div>
         <div className="border grow rounded-full">
           <form onSubmit={postComment}>

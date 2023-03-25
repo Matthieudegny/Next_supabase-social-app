@@ -2,7 +2,8 @@ import Card from "./Card";
 import Avatar from "./Avatar";
 import { useContext, useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { UserContext } from "../contexts/UserContext";
+// import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "@/contexts/UserContext";
 import Preloader from "./Preloader";
 
 export default function PostFormCard({ onPost }) {
@@ -13,19 +14,6 @@ export default function PostFormCard({ onPost }) {
   //session.user.id
   const session = useSession();
   const { profile } = useContext(UserContext);
-
-  //get info from the user
-  useEffect(() => {
-    console.log("session", session.user.id);
-    supabase
-      .from("profiles")
-      .select()
-      //eq = match
-      .eq("id", session.user.id)
-      .then((result) => {
-        // console.log(result);
-      });
-  }, []);
 
   function createPost() {
     supabase

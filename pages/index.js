@@ -3,20 +3,25 @@ import PostFormCard from "../components/PostFormCard";
 import PostCard from "../components/PostCard";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import LoginPage from "./login";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
 
 export default function Home() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [posts, setPosts] = useState([]);
-  const [profile, setProfile] = useState(null);
+
+  const { setProfile, triggerFetchUser } = useContext(UserContext);
 
   useEffect(() => {
     fetchPosts();
   }, []);
 
   useEffect(() => {
+    fetchUser();
+  }, [session?.user?.id, triggerFetchUser]);
+
+  const fetchUser = () => {
     //Returns the user's datas, if there is an active session.
     if (!session?.user?.id) {
       return;
@@ -31,9 +36,9 @@ export default function Home() {
           setProfile(result.data[0]);
         }
       });
-  }, [session?.user?.id]);
+  };
 
-  function fetchPosts() {
+  const fetchPosts = () => {
     supabase
       .from("posts")
       //profiles(id...) is a reference for the table profiles -> post.is = foreign key // profiles.id = primary key
@@ -45,21 +50,19 @@ export default function Home() {
         console.log("posts", result);
         setPosts(result.data);
       });
-  }
+  };
 
   if (!session) {
     return <LoginPage />;
   }
 
   return (
-    <UserContext.Provider value={{ profile }}>
-      <Layout>
-        <PostFormCard onPost={fetchPosts} />
-        {posts?.length > 0 &&
-          posts.map((post) => (
-            <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />
-          ))}
-      </Layout>
-    </UserContext.Provider>
+    <Layout>
+      <PostFormCard onPost={fetchPosts} />
+      {posts?.length > 0 &&
+        posts.map((post) => (
+          <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />
+        ))}
+    </Layout>
   );
 }
