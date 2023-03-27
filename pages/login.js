@@ -13,7 +13,6 @@ export default function LoginPage() {
     //   },
     // });
     try {
-      setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { RedirectTo: window.location.origin },
