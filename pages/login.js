@@ -6,22 +6,25 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 export default function LoginPage() {
   const supabase = useSupabaseClient();
   async function loginWithGoogle() {
-    try{
-
+    // await supabase.auth.signInWithOAuth({
+    //   provider: "google",
+    //   options: {
+    //     RedirectTo: window.location.origin,
+    //   },
+    // });
+    try {
+      setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          RedirectTo: window.location.origin,
-        },
+        options: { RedirectTo: window.location.origin },
       });
-      if (error) {
-        console.log(error)
-        throw error}
+      //redirect = window.location.origin
+      if (error) throw error;
+      alert("Check your email for the login link!");
+    } catch (error) {
+      alert(error.error_description || error.message);
     }
-     catch (error) {
-    alert(error.error_description || error.message)
-    
-    
+    console.log("window.location.origin", window.location.origin);
   }
   return (
     <Layout hideNavigation={true}>
