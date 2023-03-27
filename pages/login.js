@@ -18,8 +18,7 @@ export default function LoginPage() {
         options: { RedirectTo: window.location.origin },
       });
       //redirect = window.location.origin
-      if (error) throw error;
-      alert("Check your email for the login link!");
+      if (error) console.log("error", error);
     } catch (error) {
       alert(error.error_description || error.message);
     }
