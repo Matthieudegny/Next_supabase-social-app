@@ -100,9 +100,9 @@ export default function PostFormCard({ onPost }) {
           ))}
         </div>
       )}
-      <div className="flex gap-5 items-center mt-2">
+      <div className="flex gap-5 items-center mt-2 ">
         <div>
-          <label className="flex gap-1">
+          <label className="flex gap-1 cursor-pointer">
             <input
               type="file"
               className="hidden"

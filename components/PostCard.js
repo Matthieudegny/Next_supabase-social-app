@@ -279,7 +279,7 @@ export default function PostCard({
                 </button>
 
                 <a
-                  className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
+                  className="flex gap-3 py-2 my-2 cursor-pointer hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
                   onClick={() => deletePost(id)}
                 >
                   <svg

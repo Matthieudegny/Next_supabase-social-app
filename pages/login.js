@@ -6,9 +6,14 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 export default function LoginPage() {
   const supabase = useSupabaseClient();
   async function loginWithGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
+    await supabase.auth.signInWithOAuth(
+      {
+        provider: "google",
+      },
+      {
+        redirectTo: window.location.origin,
+      }
+    );
   }
   return (
     <Layout hideNavigation={true}>
