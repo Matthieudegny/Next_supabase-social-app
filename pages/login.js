@@ -11,7 +11,7 @@ export default function LoginPage() {
         provider: "google",
       },
       {
-        redirectTo: window.location.origin,
+        redirectTo: "https://share-your-prompt.vercel.app/",
       }
     );
   }
