@@ -11,7 +11,7 @@ export default function Home() {
   const session = useSession();
   const [posts, setPosts] = useState([]);
 
-  const { setProfile, triggerFetchUser } = useContext(UserContext);
+  const { setProfile } = useContext(UserContext);
 
   useEffect(() => {
     fetchPosts();
@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchUser();
-  }, [session?.user?.id, triggerFetchUser]);
+  }, [session?.user?.id]);
 
   const fetchUser = () => {
     //Returns the user's datas, if there is an active session.
@@ -31,7 +31,6 @@ export default function Home() {
       .select()
       .eq("id", session.user.id)
       .then((result) => {
-        console.log("from profiles", result);
         if (result.data.length) {
           setProfile(result.data[0]);
         }
@@ -47,7 +46,6 @@ export default function Home() {
       .is("parent", null)
       .order("created_at", { ascending: false })
       .then((result) => {
-        console.log("posts", result);
         setPosts(result.data);
       });
   };
@@ -59,10 +57,7 @@ export default function Home() {
   return (
     <Layout>
       <PostFormCard onPost={fetchPosts} />
-      {posts?.length > 0 &&
-        posts.map((post) => (
-          <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />
-        ))}
+      {posts?.length > 0 && posts.map((post) => <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />)}
     </Layout>
   );
 }

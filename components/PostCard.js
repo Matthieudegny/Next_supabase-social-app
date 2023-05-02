@@ -139,19 +139,60 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
       .delete()
       .eq("id", id)
       .then((result) => {
+        console.log("commentaire supprimé", result);
         fetchComments();
       });
   };
 
   const deletePost = (id) => {
+    // Check if the post has been saved
+    supabase
+      .from("saved_posts")
+      .delete()
+      .eq("post_id", id)
+      .then((savedPostsResult) => {
+        console.log("saved_posts supprimés", savedPostsResult);
+
+        // Check if the post has been commented
+        supabase
+          .from("posts")
+          .delete()
+          .eq("parent", id)
+          .then((savedPostsResult) => {
+            console.log("commentaires supprimés", savedPostsResult);
+
+            // Check if the post has been liked is managed by the cascade
+            // Delete the post
+            supabase
+              .from("posts")
+              .delete()
+              .eq("id", id)
+              .then((postsResult) => {
+                console.log("post supprimé", postsResult);
+                fetchPosts();
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
     supabase
       .from("posts")
       .delete()
-      .eq("id", id)
-      .then((result) => {
-        fetchPosts();
+      .eq("id", 34)
+      .then((savedPostsResult) => {
+        console.log("tesssst commentaires supprimés", savedPostsResult);
       });
-  };
+  }, []);
 
   //on click out -> close the menu
   useEffect(() => {
@@ -168,7 +209,7 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
         <div>
           <Link href={"/profile/" + profiles?.id}>
             <span className="cursor-pointer">
-              <Avatar url={profilAvatar} />
+              <Avatar url={profiles?.avatar} />
             </span>
           </Link>
         </div>
@@ -215,7 +256,7 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
               </svg>
             </button>
           )}
-          {/* Menu card */}
+          {/* Menu card -> delete + save*/}
           <div className="relative">
             {dropdownOpen && (
               <div className="absolute -right-4 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52 md:pt-6">
@@ -256,27 +297,30 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
                     {isSaved ? "Remove from saved" : "Save post"}
                   </span>
                 </button>
-
-                <a
-                  className="flex gap-3 py-2 my-2 cursor-pointer hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
-                  onClick={() => deletePost(id)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
+                {session.user.id == profiles?.id ? (
+                  <a
+                    className="flex gap-3 py-2 my-2 cursor-pointer hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
+                    onClick={() => deletePost(id)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                    />
-                  </svg>
-                  Delete
-                </a>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                      />
+                    </svg>
+                    Delete
+                  </a>
+                ) : (
+                  ""
+                )}
               </div>
             )}
           </div>
@@ -363,7 +407,7 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
                 </div>
                 <p className="text-sm text-ellipsis overflow-hidden max-w-prose">{comment.content}</p>
               </div>
-              {session.user.id == comment.profiles.id ? (
+              {session?.user.id == comment.profiles.id ? (
                 <div>
                   <button className="text-gray-400" onClick={() => deleteComment(comment.id)}>
                     <svg

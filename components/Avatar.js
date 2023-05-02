@@ -9,17 +9,12 @@ export default function Avatar({ size, url, editable, onChange }) {
   const [isUploading, setIsUploading] = useState(false);
   async function handleAvatarChange(ev) {
     const file = ev.target.files?.[0];
+    console.log("file", file);
     if (file) {
       setIsUploading(true);
-      await uploadUserProfileImage(
-        supabase,
-        session.user.id,
-        file,
-        "avatars",
-        "avatar"
-      );
+      await uploadUserProfileImage(supabase, session.user.id, file, "avatars", "avatar");
       setIsUploading(false);
-      if (onChange) onChange();
+      onChange();
     }
   }
   let width = "w-12";

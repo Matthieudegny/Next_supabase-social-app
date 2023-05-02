@@ -10,8 +10,9 @@ import ProfileContent from "../components/ProfileContent";
 import { UserContext } from "@/contexts/UserContext";
 
 export default function ProfilePage() {
-  const { profile, setProfile, setTriggerFetchUser } = useContext(UserContext);
+  const { profile, setProfile } = useContext(UserContext);
   const [editMode, setEditMode] = useState(false);
+  const [triggerFetchUser, setTriggerFetchUser] = useState(false);
   const [name, setName] = useState("");
   const [place, setPlace] = useState("");
   const router = useRouter();
@@ -23,13 +24,6 @@ export default function ProfilePage() {
   const userId = router.query.id;
 
   const supabase = useSupabaseClient();
-
-  useEffect(() => {
-    if (!userId) {
-      return;
-    }
-    setTriggerFetchUser((prev) => !prev);
-  }, [userId]);
 
   const saveProfile = () => {
     supabase
@@ -48,7 +42,25 @@ export default function ProfilePage() {
       });
   };
 
-  const fetchProfileUser = () => {
+  //fetch here myprofile
+  const fetchUser = () => {
+    //Returns the user's datas, if there is an active session.
+    if (!session?.user?.id) {
+      return;
+    }
+    supabase
+      .from("profiles")
+      .select()
+      .eq("id", session.user.id)
+      .then((result) => {
+        if (result.data.length) {
+          setProfile(result.data[0]);
+        }
+      });
+  };
+
+  //fetch here any others users
+  const fetchProfileUserVisited = () => {
     supabase
       .from("profiles")
       .select("*")
@@ -56,22 +68,25 @@ export default function ProfilePage() {
       .then((result) => {
         console.log("profile user", result);
         if (result.status === 200) {
+          console.log("profile user", result.data[0]);
           setprofileUSerVisited(result.data[0]);
         }
       });
   };
 
-  useEffect(() => {
-    console.log("userId", userId);
-    if (!userId) {
-      return;
-    }
-    fetchProfileUser();
-  }, [userId]);
-
   //check if  elements conern the user
   //userId from the URL (id route) compare to session.id
   const isMyUser = userId === session?.user?.id;
+  useEffect(() => {
+    console.log("userId", userId);
+    if (userId) {
+      if (!isMyUser) fetchProfileUserVisited();
+      else {
+        console.log("fetch usssser");
+        fetchUser();
+      }
+    }
+  }, [userId, triggerFetchUser]);
 
   return (
     <Layout profile={profile}>
@@ -79,14 +94,14 @@ export default function ProfilePage() {
         <div className="relative overflow-hidden rounded-md">
           {/* only if its my profile */}
           <Cover
-            url={profileUSerVisited?.cover}
+            url={isMyUser ? profile?.cover : profileUSerVisited?.cover}
             editable={isMyUser}
             onChange={() => setTriggerFetchUser((prev) => !prev)}
           />
           <div className="absolute top-24 left-4 z-20">
             {profile && (
               <Avatar
-                url={profileUSerVisited?.avatar}
+                url={isMyUser ? profile?.avatar : profileUSerVisited?.avatar}
                 size={"lg"}
                 editable={isMyUser}
                 onChange={() => setTriggerFetchUser((prev) => !prev)}
@@ -107,9 +122,15 @@ export default function ProfilePage() {
                     />
                   </div>
                 )}
-                {!editMode && <h1 className="text-3xl font-bold">{profileUSerVisited?.name}</h1>}
                 {!editMode && (
-                  <div className="text-gray-500 leading-4">{profileUSerVisited?.place || "Internet"}</div>
+                  <h1 className="text-3xl font-bold">
+                    {isMyUser ? profile?.name : profileUSerVisited?.name}
+                  </h1>
+                )}
+                {!editMode && (
+                  <div className="text-gray-500 leading-4">
+                    {isMyUser ? profile?.place : profileUSerVisited?.place || "Internet"}
+                  </div>
                 )}
                 {editMode && (
                   <div>
@@ -130,8 +151,8 @@ export default function ProfilePage() {
                       onClick={() => {
                         setEditMode(true);
                         //initialse the edit mode with the user's infos
-                        setName(profile.name);
-                        setPlace(profile.place);
+                        setName(profile?.name);
+                        setPlace(profile?.place);
                       }}
                       className="inline-flex mx-1 gap-1 bg-white rounded-md shadow-sm shadow-gray-500 py-1 px-2"
                     >
