@@ -37,7 +37,6 @@ export default function ProfileContent({ activeTab, userId }) {
           {posts?.length > 0 &&
             posts.map((post) => (
               <>
-                {console.log("profile postsss", post)}
                 <PostCard key={post.created_at} {...post} />
               </>
             ))}
@@ -48,15 +47,13 @@ export default function ProfileContent({ activeTab, userId }) {
           <Card>
             <h2 className="text-3xl mb-2">About me</h2>
             <p className="mb-2 text-sm">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut
-              doloremque harum maxime mollitia perferendis praesentium quaerat.
-              Adipisci, delectus eum fugiat incidunt iusto molestiae nesciunt
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut doloremque harum maxime mollitia
+              perferendis praesentium quaerat. Adipisci, delectus eum fugiat incidunt iusto molestiae nesciunt
               odio porro quae quaerat, reprehenderit, sed.
             </p>
             <p className="mb-2 text-sm">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet
-              assumenda error necessitatibus nesciunt quas quidem quisquam
-              reiciendis, similique. Amet consequuntur facilis iste iure minima
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet assumenda error necessitatibus
+              nesciunt quas quidem quisquam reiciendis, similique. Amet consequuntur facilis iste iure minima
               nisi non praesentium ratione voluptas voluptatem?
             </p>
           </Card>

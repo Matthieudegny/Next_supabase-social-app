@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [place, setPlace] = useState("");
   const router = useRouter();
+  const [profileUSerVisited, setprofileUSerVisited] = useState({});
   //childrens routes for ProfileTabs 's items ex:/profile/${userId}/about
   //allow to know the active tab
   const tab = router?.query?.tab?.[0] || "posts";
@@ -47,6 +48,27 @@ export default function ProfilePage() {
       });
   };
 
+  const fetchProfileUser = () => {
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .then((result) => {
+        console.log("profile user", result);
+        if (result.status === 200) {
+          setprofileUSerVisited(result.data[0]);
+        }
+      });
+  };
+
+  useEffect(() => {
+    console.log("userId", userId);
+    if (!userId) {
+      return;
+    }
+    fetchProfileUser();
+  }, [userId]);
+
   //check if  elements conern the user
   //userId from the URL (id route) compare to session.id
   const isMyUser = userId === session?.user?.id;
@@ -55,15 +77,16 @@ export default function ProfilePage() {
     <Layout profile={profile}>
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md">
+          {/* only if its my profile */}
           <Cover
-            url={profile?.cover}
+            url={profileUSerVisited?.cover}
             editable={isMyUser}
             onChange={() => setTriggerFetchUser((prev) => !prev)}
           />
           <div className="absolute top-24 left-4 z-20">
             {profile && (
               <Avatar
-                url={profile.avatar}
+                url={profileUSerVisited?.avatar}
                 size={"lg"}
                 editable={isMyUser}
                 onChange={() => setTriggerFetchUser((prev) => !prev)}
@@ -84,13 +107,9 @@ export default function ProfilePage() {
                     />
                   </div>
                 )}
+                {!editMode && <h1 className="text-3xl font-bold">{profileUSerVisited?.name}</h1>}
                 {!editMode && (
-                  <h1 className="text-3xl font-bold">{profile?.name}</h1>
-                )}
-                {!editMode && (
-                  <div className="text-gray-500 leading-4">
-                    {profile?.place || "Internet"}
-                  </div>
+                  <div className="text-gray-500 leading-4">{profileUSerVisited?.place || "Internet"}</div>
                 )}
                 {editMode && (
                   <div>

@@ -7,13 +7,7 @@ import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "@/contexts/UserContext";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
-export default function PostCard({
-  id,
-  content,
-  created_at,
-  photos,
-  fetchPosts,
-}) {
+export default function PostCard({ id, content, created_at, photos, profiles, fetchPosts }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
@@ -57,14 +51,12 @@ export default function PostCard({
       .then((result) => setLikes(result.data));
   };
   const fetchComments = () => {
-    console.log("iddddd", id);
     supabase
       .from("posts")
       .select("*, profiles(*)")
       //i fetch only the comments from this post thanks the id
       .eq("parent", id)
       .then((result) => {
-        console.log("fetch comment", result);
         setComments(result.data);
       });
   };
@@ -111,7 +103,6 @@ export default function PostCard({
         .eq("post_id", id)
         .eq("user_id", profilId)
         .then((result) => {
-          console.log("result like", result);
           fetchLikes();
         });
       return;
@@ -137,7 +128,6 @@ export default function PostCard({
         parent: id,
       })
       .then((result) => {
-        console.log("post comment", result);
         fetchComments();
         setCommentText("");
       });
@@ -149,7 +139,6 @@ export default function PostCard({
       .delete()
       .eq("id", id)
       .then((result) => {
-        console.log("result", result);
         fetchComments();
       });
   };
@@ -160,7 +149,6 @@ export default function PostCard({
       .delete()
       .eq("id", id)
       .then((result) => {
-        console.log("result", result);
         fetchPosts();
       });
   };
@@ -178,7 +166,7 @@ export default function PostCard({
     <Card>
       <div className="flex gap-3">
         <div>
-          <Link href={"/profile/" + profilId}>
+          <Link href={"/profile/" + profiles?.id}>
             <span className="cursor-pointer">
               <Avatar url={profilAvatar} />
             </span>
@@ -186,10 +174,8 @@ export default function PostCard({
         </div>
         <div className="grow">
           <p>
-            <Link href={"/profile/" + profilId}>
-              <span className="mr-1 font-semibold cursor-pointer hover:underline">
-                {profilName}
-              </span>
+            <Link href={"/profile/" + profiles?.id}>
+              <span className="mr-1 font-semibold cursor-pointer hover:underline">{profiles?.name}</span>
             </Link>
             shared a post
           </p>
@@ -199,10 +185,7 @@ export default function PostCard({
         </div>
         <div>
           {dropdownOpen ? (
-            <button
-              className="text-gray-400"
-              onClick={() => setDropdownOpen(false)}
-            >
+            <button className="text-gray-400" onClick={() => setDropdownOpen(false)}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -211,11 +194,7 @@ export default function PostCard({
                 stroke="currentColor"
                 className="w-6 h-6"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           ) : (
@@ -236,7 +215,7 @@ export default function PostCard({
               </svg>
             </button>
           )}
-
+          {/* Menu card */}
           <div className="relative">
             {dropdownOpen && (
               <div className="absolute -right-4 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52 md:pt-6">
@@ -315,6 +294,7 @@ export default function PostCard({
           </div>
         )}
       </div>
+      {/* section like and comment */}
       <div className="mt-5 flex gap-8">
         <button className="flex gap-2 items-center" onClick={toggleLike}>
           <svg
@@ -375,27 +355,17 @@ export default function PostCard({
               <div className="bg-gray-200 py-2 px-4 rounded-3xl md:max-w-full md:ml-1">
                 <div>
                   <Link href={"/profile/" + comment.profiles.id}>
-                    <span className="hover:underline font-semibold mr-1">
-                      {comment.profiles.name}
-                    </span>
+                    <span className="hover:underline font-semibold mr-1">{comment.profiles.name}</span>
                   </Link>
                   <span className="text-sm text-gray-400">
-                    <ReactTimeAgo
-                      timeStyle={"twitter"}
-                      date={new Date(comment.created_at).getTime()}
-                    />
+                    <ReactTimeAgo timeStyle={"twitter"} date={new Date(comment.created_at).getTime()} />
                   </span>
                 </div>
-                <p className="text-sm text-ellipsis overflow-hidden max-w-prose">
-                  {comment.content}
-                </p>
+                <p className="text-sm text-ellipsis overflow-hidden max-w-prose">{comment.content}</p>
               </div>
               {session.user.id == comment.profiles.id ? (
                 <div>
-                  <button
-                    className="text-gray-400"
-                    onClick={() => deleteComment(comment.id)}
-                  >
+                  <button className="text-gray-400" onClick={() => deleteComment(comment.id)}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -404,11 +374,7 @@ export default function PostCard({
                       stroke="currentColor"
                       className="w-6 h-6"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
