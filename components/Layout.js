@@ -9,9 +9,9 @@ export default function Layout({ children, hideNavigation }) {
   }
 
   return (
-    <div className="md:flex mt-4 max-w-4xl mx-auto gap-6 mb-24 md:mb-0">
+    <div className="md:flex mt-4  gap-6 md:ml-5% xl:ml-20% md:w-90% xl:w-60% mb-24 md:mb-0">
       {!hideNavigation && (
-        <div className="fixed  w-full   md:fixed md:top-0 md:mt-4 md:ml-2  bottom-0 md:w-64 -mb-5">
+        <div className="fixed w-full bottom-0 md:top-0 md:mt-4 md:ml-2   md:w-64 -mb-5">
           <NavigationCard />
         </div>
       )}

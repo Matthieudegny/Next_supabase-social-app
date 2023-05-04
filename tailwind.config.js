@@ -11,6 +11,14 @@ module.exports = {
         socialBg: "#F5F7FB",
         socialBlue: "#218DFA",
       },
+      margin: {
+        "5%": "5%",
+        "20%": "20%",
+      },
+      width: {
+        "60%": "60%",
+        "90%": "90%",
+      },
     },
   },
   plugins: [],

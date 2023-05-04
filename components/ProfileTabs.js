@@ -1,16 +1,12 @@
 import Link from "next/link";
 
 export default function ProfileTabs({ userId, active }) {
-  const tabClasses =
-    "flex gap-1 px-4 py-1 items-center border-b-4 border-b-white";
+  const tabClasses = "flex gap-1 px-4 py-1 items-center border-b-4 border-b-white";
   const activeTabClasses =
     "flex gap-1 px-4 py-1 items-center border-socialBlue border-b-4 text-socialBlue font-bold";
   return (
     <div className="mt-4 md:mt-10 flex gap-0">
-      <Link
-        href={`/profile/${userId}/posts`}
-        className={active === "posts" ? activeTabClasses : tabClasses}
-      >
+      <Link href={`/profile/${userId}/posts`} className={active === "posts" ? activeTabClasses : tabClasses}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -27,7 +23,7 @@ export default function ProfileTabs({ userId, active }) {
         </svg>
         <span className="hidden sm:block">Posts</span>
       </Link>
-      <Link
+      {/* <Link
         href={`/profile/${userId}/about`}
         className={active === "about" ? activeTabClasses : tabClasses}
       >
@@ -46,7 +42,7 @@ export default function ProfileTabs({ userId, active }) {
           />
         </svg>
         <span className="hidden sm:block">About</span>
-      </Link>
+      </Link> */}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import Card from "./Card";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -8,8 +8,9 @@ import { UserContext } from "@/contexts/UserContext";
 export default function NavigationCard() {
   const router = useRouter();
   const { profile } = useContext(UserContext);
+  const [currentPage, setcurrentPage] = useState("/");
 
-  const { asPath: pathname } = router;
+  const route = router.pathname;
   const activeElementClasses =
     "text-sm md:text-md flex gap-1 md:gap-3 py-3 my-1 bg-socialBlue text-white md:-mx-7 px-6 md:px-7 rounded-md shadow-md shadow-gray-300 items-center";
   const nonActiveElementClasses =
@@ -17,8 +18,13 @@ export default function NavigationCard() {
 
   const supabase = useSupabaseClient();
   async function logout() {
+    console.log("logout");
     await supabase.auth.signOut();
   }
+
+  useEffect(() => {
+    setcurrentPage(route);
+  }, [route]);
 
   //profile as a state in the parent component, is set at null, just the time to be set
   //i protect its value with 0, to be read
@@ -29,12 +35,7 @@ export default function NavigationCard() {
       <Card noPadding={true}>
         <div className=" z-40 px-4 py-2 flex justify-between  md:block shadow-md shadow-gray-500 md:shadow-none ">
           <h2 className="text-gray-400 mb-3 hidden md:block">Navigation</h2>
-          <Link
-            href="/"
-            className={
-              pathname === "/" ? activeElementClasses : nonActiveElementClasses
-            }
-          >
+          <Link href="/" className={currentPage === "/" ? activeElementClasses : nonActiveElementClasses}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -54,11 +55,7 @@ export default function NavigationCard() {
 
           <Link
             href={"/profile/" + link}
-            className={
-              pathname === "/profile/"
-                ? activeElementClasses
-                : nonActiveElementClasses
-            }
+            className={currentPage.includes("/profile/") ? activeElementClasses : nonActiveElementClasses}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -74,15 +71,11 @@ export default function NavigationCard() {
                 d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
               />
             </svg>
-            <span className="hidden md:block">My profile</span>
+            <span className="hidden md:block">Profile</span>
           </Link>
           <Link
             href="/saved"
-            className={
-              pathname === "/saved"
-                ? activeElementClasses
-                : nonActiveElementClasses
-            }
+            className={currentPage === "/saved" ? activeElementClasses : nonActiveElementClasses}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

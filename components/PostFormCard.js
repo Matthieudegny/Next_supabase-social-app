@@ -51,17 +51,13 @@ export default function PostFormCard({ onPost }) {
             console.log("result", result);
             const url =
               //.env + url to the supabase storage
-              process.env.NEXT_PUBLIC_SUPABASE_URL +
-              "/storage/v1/object/public/photos/" +
-              result.data.path;
+              process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/photos/" + result.data.path;
             setUploads((prevUploads) => [...prevUploads, url]);
           });
         if (result?.data) {
           const url =
             //.env + url to the supabase storage
-            process.env.NEXT_PUBLIC_SUPABASE_URL +
-            "/storage/v1/object/public/photos/" +
-            result.data.path;
+            process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/photos/" + result.data.path;
           setUploads((prevUploads) => [...prevUploads, url]);
         } else {
           console.log("error add photo", result);
@@ -103,12 +99,7 @@ export default function PostFormCard({ onPost }) {
       <div className="flex gap-5 items-center mt-2 ">
         <div>
           <label className="flex gap-1 cursor-pointer">
-            <input
-              type="file"
-              className="hidden"
-              multiple
-              onChange={addPhotos}
-            />
+            <input type="file" className="hidden" multiple onChange={addPhotos} />
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -127,10 +118,7 @@ export default function PostFormCard({ onPost }) {
           </label>
         </div>
         <div className="grow text-right">
-          <button
-            onClick={createPost}
-            className="bg-socialBlue text-white px-6 py-1 rounded-md"
-          >
+          <button onClick={createPost} className="bg-socialBlue text-white px-6 py-1 rounded-md">
             Share
           </button>
         </div>

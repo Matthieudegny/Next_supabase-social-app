@@ -1,6 +1,7 @@
 import Layout from "../components/Layout";
 import Card from "../components/Card";
 import Avatar from "../components/Avatar";
+import LoginPage from "./login";
 import { useRouter } from "next/router";
 import { useEffect, useState, useContext } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -50,7 +51,7 @@ export default function ProfilePage() {
     }
     supabase
       .from("profiles")
-      .select()
+      .select("*")
       .eq("id", session.user.id)
       .then((result) => {
         if (result.data.length) {
@@ -78,18 +79,17 @@ export default function ProfilePage() {
   //userId from the URL (id route) compare to session.id
   const isMyUser = userId === session?.user?.id;
   useEffect(() => {
-    console.log("userId", userId);
     if (userId) {
       if (!isMyUser) fetchProfileUserVisited();
-      else {
-        console.log("fetch usssser");
-        fetchUser();
-      }
     }
   }, [userId, triggerFetchUser]);
 
+  if (!session) {
+    return <LoginPage />;
+  }
+
   return (
-    <Layout profile={profile}>
+    <Layout>
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md">
           {/* only if its my profile */}
@@ -212,7 +212,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </Card>
-      <ProfileContent activeTab={tab} userId={userId} />
+      <ProfileContent activeTab={tab} userId={userId} infoUSer={isMyUser ? profile : profileUSerVisited} />
     </Layout>
   );
 }

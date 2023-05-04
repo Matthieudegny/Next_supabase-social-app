@@ -7,7 +7,7 @@ import ReactTimeAgo from "react-time-ago";
 import { UserContext } from "@/contexts/UserContext";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
-export default function PostCard({ id, content, created_at, photos, profiles, fetchPosts }) {
+export default function PostCard({ infoUSer, id, content, created_at, photos, profiles, fetchPosts }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
@@ -139,7 +139,6 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
       .delete()
       .eq("id", id)
       .then((result) => {
-        console.log("commentaire supprimé", result);
         fetchComments();
       });
   };
@@ -151,16 +150,12 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
       .delete()
       .eq("post_id", id)
       .then((savedPostsResult) => {
-        console.log("saved_posts supprimés", savedPostsResult);
-
         // Check if the post has been commented
         supabase
           .from("posts")
           .delete()
           .eq("parent", id)
           .then((savedPostsResult) => {
-            console.log("commentaires supprimés", savedPostsResult);
-
             // Check if the post has been liked is managed by the cascade
             // Delete the post
             supabase
@@ -168,7 +163,6 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
               .delete()
               .eq("id", id)
               .then((postsResult) => {
-                console.log("post supprimé", postsResult);
                 fetchPosts();
               })
               .catch((error) => {
@@ -183,16 +177,6 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
         console.error(error);
       });
   };
-
-  useEffect(() => {
-    supabase
-      .from("posts")
-      .delete()
-      .eq("id", 34)
-      .then((savedPostsResult) => {
-        console.log("tesssst commentaires supprimés", savedPostsResult);
-      });
-  }, []);
 
   //on click out -> close the menu
   useEffect(() => {
@@ -327,7 +311,7 @@ export default function PostCard({ id, content, created_at, photos, profiles, fe
         </div>
       </div>
       <div>
-        <p className="my-3 text-sm">{content}</p>
+        <p className="my-3 text-sm md:text-lg leading-10">{content}</p>
         {photos?.length > 0 && (
           <div className="flex gap-4">
             {photos.map((photo) => (

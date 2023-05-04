@@ -57,7 +57,9 @@ export default function Home() {
   return (
     <Layout>
       <PostFormCard onPost={fetchPosts} />
-      {posts?.length > 0 && posts.map((post) => <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />)}
+      {posts?.length > 0
+        ? posts.map((post) => <PostCard key={post.id} fetchPosts={fetchPosts} {...post} />)
+        : ""}
     </Layout>
   );
 }

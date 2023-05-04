@@ -1,5 +1,6 @@
 import Layout from "../components/Layout";
 import PostCard from "../components/PostCard";
+import LoginPage from "./login";
 import { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UserContext } from "../contexts/UserContext";
@@ -28,11 +29,14 @@ export default function SavedPostsPage() {
           .then((result) => setPosts(result.data));
       });
   }, [session?.user?.id]);
+
+  if (!session) {
+    return <LoginPage />;
+  }
   return (
     <Layout>
       <h1 className="text-6xl mb-4 text-gray-300">Saved posts</h1>
-      {posts.length > 0 &&
-        posts.map((post) => <PostCard key={post.id} {...post} />)}
+      {posts.length > 0 ? posts.map((post) => <PostCard key={post.id} {...post} />) : ""}
     </Layout>
   );
 }
